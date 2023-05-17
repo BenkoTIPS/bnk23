@@ -1,5 +1,6 @@
 #####################
 # Init env
+$appName = "ima"
 $envName = "bnk"
 $rgACR = "rg-shared"
 $acrName = "$envName"+"23cusacr"
@@ -16,37 +17,110 @@ $acrName = "$envName"+"23cusacr"
 # 8. Helm Deploy
 # 9. Helm deploy from CI/CD
 ###
-###  SETUP
-# -  Kubectl
-# -  ACR registry
-# -  AKS cluster
-# -  Namespace
-# -  Lens 
 
 
-# create acr from command line with naming poc-ncus-shared-ACR-01 where poc is an env variable
-az acr create -n $acrName -g $rgACR --sku Basic --admin-enabled true
+# Project Tye
+dotnet tool update -g Microsoft.Tye --version "0.11.0-alpha.22111.1"
 
-# attach acr to aks
-$aksRg = "rg-shared-cus"
-$aksName = "$envName-shared-cus-aks"
-$acrId = $(az acr show --name $acrName --resource-group $aksRG --query id -o tsv)
+tye run
+tye build
+tye push -i
+tye deploy -i
 
-az aks update --name $aksName --resource-group $aksRg --attach-acr $acrId
-# az role assignment create --assignee $acrId --role "AcrPull" --scope $aksId
+# Basic Dockerfile
+cd .\myApp
+dotnet build --configuration release
+dotnet publish -c release -o dist
+cd .\dist
+dotnet myApp.dll
+# add docker file to ./myApp folder
 
-az acr login -n $acrName
+cd .\myApp\ # so we're in .\myApp
+docker build -t imaweb.simple -f .\Dockerfile.simple .
+docker image list
+docker images --format "{{.Repository}}:{{.Tag}}"
+docker run -p 80:80 -d imaweb.simple:latest
+docker container list
+docker container stop ed9
+docker container rm 3d9
+
+# Dockerbuild
+cd myApp
+docker build -f ./code/imaWeb/Dockerfile -t imaweb:v23 ./code/ImaWeb --build-arg tag=v0.1
+docker run --name imaweb -p 3000:80 imaweb:v23
+
+# add docker-compose to ./ folder
+docker-compose build
+docker-compose up -d
+docker-compose down 
 
 
-docker build -f ./code/imaWeb/Dockerfile -t mykuma:v0.1 ./code/ImaWeb --build-arg tag=v0.1
-docker tag mykuma:v0.1 "$acrName.azurecr.io/mykuma:v0.1"
-docker push "$acrName.azurecr.io/mykuma:v0.1"
+# Login to registry, tag and push
+# using ghcr.io
+docker login ghcr.io -u mbenko
 
-docker build -f ./myMeshApi/Dockerfile -t mymeshapi:v0.1 ./mymeshapi --build-arg tag=v0.1
-docker tag mymeshapi:latest "$acrName.azurecr.io/mymeshapi:v0.1"
-docker push "$acrName.azurecr.io/mymeshapi:v0.1"
+docker image list
+
+docker tag myapp ghcr.io/mbenko/myapp
+docker tag myapi ghcr.io/mbenko/myapi
+docker push ghcr.io/mbenko/myapp
+docker push ghcr.io/mbenko/myapi
+
+# using vsl22.azurecr.io
+
+$acrName = "vsl22acr.azurecr.io"
+az acr login -n vsl22acr
+
+$rg = "vsl22-demos-rg"
+
+# Docker build locally
+docker build -f ./bnkApp/Dockerfile -t bnkapp:cli-v4 . --build-arg tag=v4
+docker run -p 8080:80 -d bnkapp:cli-v4
+
+# Docker build on ACR & push image
+az acr build --image vsl22acr.azurecr.io/bnkapp:v4-test --registry vsl22acr -f ./bnkApp/Dockerfile . --build-arg tag=v4
+
+# Deploy code to a linux container web app
+$appHost = "vsl22-host"
+az appservice plan create --name $appHost --resource-group $rg --sku B1 --is-linux
+az webapp create --resource-group $rg --plan $appHost --name vsl22-app `
+    --deployment-container-image-name vsl22acr.azurecr.io/bnkapp:v4-test
+https://vsl22-app4.azurewebsites.net 
 
 
-az acr repository list -n $acrName -o table
-az acr repository show-tags -n $acrName --repository myapp -o table
-#####################
+
+# Azure Container Apps
+$rg = "vsl22-demos-rg"
+$env = "vsl22-aca-env"
+az containerapp up -n aca-myapp -g $rg --environment $env --source ./imaweb
+
+az containerapp list -o table
+az containerapp update -n vsl22-aca-myapp -g vsl22-demos-rg --set-env-vars "EnvName=ACA-myApp"
+
+
+# Kubernetes
+az aks get-credentials -n vsl22-aks -g vsl22-demos-rg
+kubectl cluster-info
+
+# Attach ACR to cluster
+az aks update -n vsl22-aks -g vsl22-demos-rg --attach-acr vsl22acr
+
+# Run some pods
+kubectl run myapp-pod --image ghcr.io/mbenko/myapp:latest --env="EnvName=K8S"
+
+kubectl exec -ti myapp-pod -- bash
+kubectl port-forward myapp-pod 8080:80
+kubectl get all
+kubectl logs myapp-pod
+kubectl delete pod myapp-pod
+
+kubectl get all -A
+
+# Deploy the VSL app
+kubectl create namespace vsl-poc
+
+kubectl apply -n vsl-poc -f k8s-vsl22.yml # deploy folder
+
+
+
+
