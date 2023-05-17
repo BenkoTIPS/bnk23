@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "imaWeb", "imaWeb\imaWeb.csproj", "{31C0FE03-BF64-4242-86B8-D69EEE0EECF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "imaWeb", "code\imaWeb\imaWeb.csproj", "{31C0FE03-BF64-4242-86B8-D69EEE0EECF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "imaApi", "imaApi\imaApi.csproj", "{FEEF8848-5042-45F3-859B-0D6E8058AC5F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "imaApi", "code\imaApi\imaApi.csproj", "{FEEF8848-5042-45F3-859B-0D6E8058AC5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
