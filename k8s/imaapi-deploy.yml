@@ -1,0 +1,24 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imaapi-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: imaapi
+  template:
+    metadata:
+      labels:
+        app: imaapi
+    spec:
+      containers:
+        - name: imaapi
+          image: bnk23cusacr.azurecr.io/imaapi:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            limits: 
+              cpu: 500m
+              memory: 128Mi

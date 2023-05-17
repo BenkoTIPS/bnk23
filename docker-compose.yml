@@ -1,0 +1,23 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+
+version: '3.4'
+
+services:
+  imaapi:
+    image: bnk23cusacr.azurecr.io/imaapi
+    build:
+      context: .
+      dockerfile: code/imaApi/Dockerfile
+    ports:
+      - 5300:5300
+  
+  imaweb:
+    image: bnk23cusacr.azurecr.io/imaweb
+    build:
+      context: .
+      dockerfile: code/imaWeb/Dockerfile
+    ports:
+      - 5400:80
+    environment:
+      - EnvName=Docker-Compose
+      - ApiUrl=http://imaapi:5300/westherforecast

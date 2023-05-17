@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imaweb-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: imaweb
+  template:
+    metadata:
+      labels:
+        app: imaweb
+    spec:
+      containers:
+        - name: imaweb
+          image: bnk23cusacr.azurecr.io/imaweb:latest
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: the-configmap
+          env:
+          - name: ASPNETCORE_URLS
+            value: http://*:80
+          resources:
+            limits: 
+              cpu: 500m
+              memory: 128Mi          
+

@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imaweb-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: imaweb
+  template:
+    metadata:
+      labels:
+        app: imaweb
+    spec:
+      containers:
+        - name: imaweb
+          image: bnk23cusacr.azurecr.io/imaweb:latest
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: the-configmap
+          env:
+          - name: ASPNETCORE_URLS
+            value: http://*:80
+          - name: ApiUrl
+            value: http://imaapi-service:5300
+          resources:
+            limits: 
+              cpu: 500m
+              memory: 128Mi          
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: imaweb-service
+spec:
+  selector:
+    app: imaweb
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: imaapi-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: imaapi
+  template:
+    metadata:
+      labels:
+        app: imaapi
+    spec:
+      containers:
+        - name: imaapi
+          image: bnk23cusacr.azurecr.io/imaapi:latest
+          ports:
+            - containerPort: 5300
+          resources:
+            limits: 
+              cpu: 500m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: imaapi-service
+spec:
+  selector:
+    app: imaapi
+  ports:
+    - protocol: TCP
+      port: 5300
+      targetPort: 5300
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: the-configmap
+data:
+  EnvName: From-ConfigMap

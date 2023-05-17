@@ -46,12 +46,12 @@
             "dockerBuild": {
                 "tag": "ima23dev:dev",
                 "target": "base",
-                "dockerfile": "${workspaceFolder}/code/imaWeb/Dockerfile",
+                "dockerfile": "${workspaceFolder}/code/imaApi/Dockerfile",
                 "context": "${workspaceFolder}",
                 "pull": true
             },
             "netCore": {
-                "appProject": "${workspaceFolder}/code/imaWeb/imaWeb.csproj"
+                "appProject": "${workspaceFolder}/code/imaApi/imaApi.csproj"
             }
         },
         {
@@ -62,13 +62,13 @@
             ],
             "dockerBuild": {
                 "tag": "ima23dev:latest",
-                "dockerfile": "${workspaceFolder}/code/imaWeb/Dockerfile",
+                "dockerfile": "${workspaceFolder}/code/imaApi/Dockerfile",
                 "context": "${workspaceFolder}",
                 "platform": "linux/amd64",
                 "pull": true
             },
             "netCore": {
-                "appProject": "${workspaceFolder}/code/imaWeb/imaWeb.csproj"
+                "appProject": "${workspaceFolder}/code/imaApi/imaApi.csproj"
             }
         },
         {
@@ -79,7 +79,7 @@
             ],
             "dockerRun": {},
             "netCore": {
-                "appProject": "${workspaceFolder}/code/imaWeb/imaWeb.csproj",
+                "appProject": "${workspaceFolder}/code/imaApi/imaApi.csproj",
                 "enableDebugging": true
             }
         },
@@ -91,7 +91,7 @@
             ],
             "dockerRun": {},
             "netCore": {
-                "appProject": "${workspaceFolder}/code/imaWeb/imaWeb.csproj"
+                "appProject": "${workspaceFolder}/code/imaApi/imaApi.csproj"
             }
         }
     ]

@@ -54,10 +54,13 @@ docker-compose build
 docker-compose up -d
 docker-compose down 
 
+az acr login -n bnk23cusacr
+docker-compose push
 
 # Login to registry, tag and push
 # using ghcr.io
 docker login ghcr.io -u mbenko
+docker login bnk23cusacr.azurecr.io
 
 docker image list
 
@@ -100,10 +103,10 @@ az containerapp update -n vsl22-aca-myapp -g vsl22-demos-rg --set-env-vars "EnvN
 
 # Kubernetes
 az aks get-credentials -n vsl22-aks -g vsl22-demos-rg
+az aks get-credentials --resource-group rg-shared-cus --name bnk-shared-cus-aks
 kubectl cluster-info
 
-# Attach ACR to cluster
-az aks update -n vsl22-aks -g vsl22-demos-rg --attach-acr vsl22acr
+
 
 # Run some pods
 kubectl run myapp-pod --image ghcr.io/mbenko/myapp:latest --env="EnvName=K8S"
@@ -117,9 +120,14 @@ kubectl delete pod myapp-pod
 kubectl get all -A
 
 # Deploy the VSL app
-kubectl create namespace vsl-poc
+$ns = "nashville-vslive"
+kubectl create namespace $ns
 
-kubectl apply -n vsl-poc -f k8s-vsl22.yml # deploy folder
+kubectl apply -n $ns -f k8s.yml # deploy folder
+kubectl delete -n $ns -f .\k8s.yml
+
+
+
 
 
 

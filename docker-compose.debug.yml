@@ -1,0 +1,16 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+
+version: '3.4'
+
+services:
+  imaapi:
+    image: imaapi
+    build:
+      context: .
+      dockerfile: code/imaApi/Dockerfile
+    ports:
+      - 5300:5300
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw

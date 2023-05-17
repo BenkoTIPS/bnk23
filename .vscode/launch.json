@@ -55,7 +55,7 @@
             "request": "launch",
             "preLaunchTask": "docker-run: debug",
             "netCore": {
-                "appProject": "${workspaceFolder}/code/imaWeb/imaWeb.csproj"
+                "appProject": "${workspaceFolder}/code/imaApi/imaApi.csproj"
             }
         }
     ]
